@@ -1,19 +1,23 @@
 import React, {useState} from 'react'
 import {AiFillEyeInvisible, AiOutlineEye} from "react-icons/ai"
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import { OAuth } from '../components';
+import {db} from "../firebase";
+import { ToastContainer, toast } from 'react-toastify';
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth"
+import { serverTimestamp, setDoc, doc } from 'firebase/firestore';
 function SignUp() {
 
   
   const [formData, setFormData]= useState({
     email:'',
     password: '',
-    name:''
+    username:''
   });
   const [showPassword, setShowPassword] = useState(true)
 
-  const {email, password} = formData;
-
+  const {email, password, username} = formData;
+  const navigate = useNavigate();
   function onchangeHandle(e) {
     setFormData((prevState) => ({
       ...prevState,
@@ -23,6 +27,31 @@ function SignUp() {
 
   function handleIconClick() {
       setShowPassword(prev => !prev);
+  }
+
+  // Handle Form Submit
+  async function onFormSubmit (e) {
+    e.preventDefault()
+    try {
+      const auth = getAuth()
+      const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+      updateProfile(auth.currentUser, {
+        displayName:username
+      })
+
+      const user = userCredentials.user;
+      const formDataCopy = {... formData}
+      delete formDataCopy.password
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      toast.success("Sign Up was at Success! 🥳🥳")
+      navigate('/');
+      console.log(user)
+    } catch (error) {
+      console.log(error)
+      toast.error(`Something has happened while registering!😟 `)
+    }
   }
 
 
@@ -38,14 +67,14 @@ function SignUp() {
           />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'> 
-          <form>
+          <form onSubmit={onFormSubmit}>
             <input 
               className='w-full mb-6 p-2 rounded-md outline-none text-gray-700 bg-white text-xl border-gray-300 transition ease-in-out' 
               type="text" 
-              id='name'
+              id='username'
               name="name" 
               placeholder='Enter Name'
-              value={name}
+              value={username}
               onChange={onchangeHandle}
             />
             <input 
