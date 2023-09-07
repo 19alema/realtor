@@ -2,6 +2,9 @@ import React, {useState} from 'react'
 import {AiFillEyeInvisible, AiOutlineEye} from "react-icons/ai"
 import { Link } from 'react-router-dom';
 import { OAuth } from '../components';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 function SignIn() {
 
   const [formData, setFormData]= useState({
@@ -9,8 +12,8 @@ function SignIn() {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(true)
-
   const {email, password} = formData;
+  const navigate = useNavigate()
 
   function onchangeHandle(e) {
     setFormData((prevState) => ({
@@ -23,6 +26,21 @@ function SignIn() {
       setShowPassword(prev => !prev);
   }
 
+
+  async function onFormSignIn(e) {
+      e.preventDefault();
+      try {
+        const auth = getAuth();
+      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+      if(userCredentials.user) {
+        console.log("Sign in success");
+        toast.success('Successfully signed in');
+        navigate('/')
+      }
+      } catch (error) {
+        toast.error("Wrong user credentials")
+      }
+  }
   return (
     <section>
       <h1 className='text-3xl text-center mt-6 font-bold'>Sign In</h1>
@@ -35,7 +53,7 @@ function SignIn() {
           />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'> 
-          <form>
+          <form onSubmit={onFormSignIn}>
             <input 
               className='w-full mb-6 p-2 rounded-md outline-none text-gray-700 bg-white text-xl border-gray-300 transition ease-in-out' 
               type="text" 

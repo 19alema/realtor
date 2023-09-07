@@ -2,20 +2,32 @@ import React, {useState} from 'react'
 import {AiFillEyeInvisible, AiOutlineEye} from "react-icons/ai"
 import { Link } from 'react-router-dom';
 import { OAuth } from '../components';
+import { getAuth, sendPasswordResetEmail, updatePassword } from 'firebase/auth';
+import { toast } from 'react-toastify';
 
 function ForgotPassword() {
   
-  const [password, setPassword]= useState('');
+  const [email, setEmail]= useState('');
   const [showPassword, setShowPassword] = useState(true)
 
 
 
   function onchangeHandle(e) {
-    setFormData(e.target.value)
+    setEmail(e.target.value)
   }
 
   function handleIconClick() {
       setShowPassword(prev => !prev);
+  }
+  async function changeForgotPassword(e) {
+    e.preventDefault();
+   try {
+    const auth = getAuth();
+    await sendPasswordResetEmail(auth, email);
+    toast.success("Email has been send")
+   } catch (error) {
+    toast.error("Something went wrong");
+   }
   }
 
   return (
@@ -30,14 +42,14 @@ function ForgotPassword() {
           />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'> 
-          <form>
+          <form onSubmit={changeForgotPassword}>
             <input 
               className='w-full mb-6 p-2 rounded-md outline-none text-gray-700 bg-white text-xl border-gray-300 transition ease-in-out' 
-              type="text" 
+              type="email" 
               id='email'
               name="name" 
               placeholder='Enter Email Address'
-              value={password}
+              value={email}
               onChange={onchangeHandle}
             />
             <div>
