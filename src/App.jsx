@@ -1,5 +1,5 @@
 import { Route,Routes } from "react-router-dom";
-import { Header } from "./components";
+import { Header, PrivateRoute } from "./components";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {Home, Profile,Offers,SignUp, SignIn,ForgotPassword} from "./pages"
@@ -10,7 +10,9 @@ function App() {
       <Routes>
    
         <Route path="/" element={<Home />}/>
-        <Route path="/profile" element={<Profile />}/>
+       <Route path="/profile" element={<PrivateRoute />}>
+          <Route path="/profile" element={<Profile />}/>
+       </Route>
         <Route path="/offers" element={<Offers />}/>
         <Route path="/sign-up" element={<SignUp />}/>
         <Route path="/sign-in" element={<SignIn />}/>
