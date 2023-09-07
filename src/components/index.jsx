@@ -1,4 +1,5 @@
 import Header from "./Header";
 import OAuth from "./OAuth";
 import PrivateRoute from "./PrivateRoute";
-export {Header, OAuth, PrivateRoute}
+import Spinner from "./Spinner";
+export {Header, OAuth, PrivateRoute, Spinner}
